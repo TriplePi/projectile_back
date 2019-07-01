@@ -3,14 +3,11 @@ package com.triplepi.projectile.rest;
 import com.triplepi.projectile.models.domain.ScheduleItemDTO;
 import com.triplepi.projectile.models.im.ScheduleItemActionIM;
 import com.triplepi.projectile.services.ScheduleService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("/schedule")
+@RestController("/api/schedule")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -22,6 +19,11 @@ public class ScheduleController {
     @PostMapping
     public void addScheduleItem(@RequestBody List<ScheduleItemDTO> scheduleItemDTOList){
         scheduleService.addScheduleItems(scheduleItemDTOList);
+    }
+
+    @GetMapping()
+    public void getSchedule(){
+
     }
 
     @PostMapping("{id}/action")

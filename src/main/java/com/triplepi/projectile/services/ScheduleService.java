@@ -6,6 +6,7 @@ import com.triplepi.projectile.repositories.ScheduleItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -18,12 +19,34 @@ public class ScheduleService {
         this.scheduleItemRepository = scheduleItemRepository;
     }
 
-    public void addScheduleItems(List<ScheduleItemDTO> scheduleItemDTOs){
+    public void addScheduleItems(List<ScheduleItemDTO> scheduleItemDTOs) {
         scheduleItemRepository.saveAll(scheduleItemDTOs);
     }
 
     public void saveAction(Long scheduleItemId, ScheduleItemActionIM scheduleItemActionIM) {
         ScheduleItemDTO scheduleItemDTO = scheduleItemRepository.getOne(scheduleItemId);
-        //status
+        if (scheduleItemDTO.getStatus() == ScheduleItemDTO.StatusEnum.NEW && scheduleItemActionIM.getAction() == ScheduleItemActionIM.ActionEnum.START) {
+            scheduleItemDTO.setStatus(ScheduleItemDTO.StatusEnum.STARTED);
+            scheduleItemDTO.setFactStartDate(LocalDateTime.now());
+        }
+        if (scheduleItemDTO.getStatus() == ScheduleItemDTO.StatusEnum.STARTED && scheduleItemActionIM.getAction() == ScheduleItemActionIM.ActionEnum.STARTEXECUTION) {
+            scheduleItemDTO.setStatus(ScheduleItemDTO.StatusEnum.EXECUTIONSTARTED);
+            scheduleItemDTO.setFactStartExecutionDate(LocalDateTime.now());
+        }
+        if (scheduleItemDTO.getStatus() == ScheduleItemDTO.StatusEnum.EXECUTIONSTARTED && scheduleItemActionIM.getAction() == ScheduleItemActionIM.ActionEnum.SUSPEND) {
+            scheduleItemDTO.setStatus(ScheduleItemDTO.StatusEnum.SUSPENDING);
+        }
+        if (scheduleItemDTO.getStatus() == ScheduleItemDTO.StatusEnum.SUSPENDING && scheduleItemActionIM.getAction() == ScheduleItemActionIM.ActionEnum.RESUME) {
+            scheduleItemDTO.setStatus(ScheduleItemDTO.StatusEnum.EXECUTIONSTARTED);
+        }
+        if (scheduleItemActionIM.getAction() == ScheduleItemActionIM.ActionEnum.FINISH) {
+            scheduleItemDTO.setStatus(ScheduleItemDTO.StatusEnum.FINISHED);
+            scheduleItemDTO.setFactFinishDate(LocalDateTime.now());
+        }
+        if (scheduleItemActionIM.getAction() == ScheduleItemActionIM.ActionEnum.EXECUTEPARTIAL) {
+            scheduleItemDTO.setQuarantineCount(scheduleItemDTO.getQuarantineCount() + scheduleItemActionIM.getProgress().getQuarantine().getCount());
+            scheduleItemDTO.setFactCount(scheduleItemDTO.getFactCount() + scheduleItemActionIM.getProgress().getProcessed().getCount());
+        }
+        scheduleItemRepository.save(scheduleItemDTO);
     }
 }
