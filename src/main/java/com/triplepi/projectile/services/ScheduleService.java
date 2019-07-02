@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleService {
@@ -48,5 +50,12 @@ public class ScheduleService {
             scheduleItemDTO.setFactCount(scheduleItemDTO.getFactCount() + scheduleItemActionIM.getProgress().getProcessed().getCount());
         }
         scheduleItemRepository.save(scheduleItemDTO);
+    }
+
+    public List<ScheduleItemDTO> getSchedule(String begin, String end, Long workCenterId) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:SSZ");
+        LocalDateTime beginDateTime = LocalDateTime.parse(begin, dateTimeFormatter);
+        LocalDateTime endDateTime = LocalDateTime.parse(end, dateTimeFormatter);
+        return scheduleItemRepository.findAll().stream().filter(x -> x.getStartDate().isAfter(beginDateTime) && x.getFactFinishDate().isBefore(endDateTime) && x.getWorkCenter().getId().equals(workCenterId)).collect(Collectors.toList());
     }
 }

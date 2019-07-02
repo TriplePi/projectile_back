@@ -22,11 +22,11 @@ public class ScheduleController {
     }
 
     @GetMapping()
-    public void getSchedule(){
-
+    public List<ScheduleItemDTO> getSchedule(@RequestParam String begin, @RequestParam String end, @RequestParam Long workCenterId){
+        return scheduleService.getSchedule(begin,end,workCenterId);
     }
 
-    @PostMapping("{id}/action")
+    @PostMapping("{id}/actions")
     public void saveAction(@PathVariable Long id, @RequestBody ScheduleItemActionIM scheduleItemActionIM){
         scheduleService.saveAction(id,scheduleItemActionIM);
     }
