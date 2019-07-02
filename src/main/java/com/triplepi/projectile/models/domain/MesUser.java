@@ -1,5 +1,7 @@
 package com.triplepi.projectile.models.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -10,6 +12,8 @@ public class MesUser {
     @Id
     @GeneratedValue
     private Long id;
+
+    private String name;
 
     private String username;
 
@@ -47,5 +51,13 @@ public class MesUser {
 
     public void setJwt(String jwt) {
         this.jwt = jwt;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

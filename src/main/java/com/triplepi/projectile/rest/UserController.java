@@ -2,12 +2,12 @@ package com.triplepi.projectile.rest;
 
 import com.triplepi.projectile.models.domain.MesUser;
 import com.triplepi.projectile.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController("/user")
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -16,13 +16,20 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping("/check")
     public Boolean checkByPass(@RequestBody MesUser user) {
-        return userService.checkPassword(user);
+        if(user.getJwt().equals(""))
+            return userService.checkPassword(user);
+        else return userService.checkByJwt(user);
+    }
+
+    @GetMapping
+    public List<MesUser> getUsers(){
+        return userService.getUsers();
     }
 
     @PostMapping
-    public Boolean checkByJwt(@RequestBody MesUser user){
-        return userService.checkByJwt(user);
+    public void saveUsers(@RequestBody List<MesUser> users){
+        userService.saveUsers(users);
     }
 }

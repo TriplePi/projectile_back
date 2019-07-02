@@ -5,9 +5,11 @@ import com.triplepi.projectile.models.im.ScheduleItemActionIM;
 import com.triplepi.projectile.services.ScheduleService;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
-@RestController("/api/schedule")
+@RestController
+@RequestMapping("/api/schedule")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -21,12 +23,12 @@ public class ScheduleController {
         scheduleService.addScheduleItems(scheduleItemDTOList);
     }
 
-    @GetMapping()
-    public List<ScheduleItemDTO> getSchedule(@RequestParam String begin, @RequestParam String end, @RequestParam Long workCenterId){
+    @GetMapping
+    public List<ScheduleItemDTO> getSchedule(@RequestParam String begin, @RequestParam String end, @RequestParam Long workCenterId) throws ParseException {
         return scheduleService.getSchedule(begin,end,workCenterId);
     }
 
-    @PostMapping("{id}/actions")
+    @GetMapping("/actions/{id}")
     public void saveAction(@PathVariable Long id, @RequestBody ScheduleItemActionIM scheduleItemActionIM){
         scheduleService.saveAction(id,scheduleItemActionIM);
     }

@@ -6,9 +6,13 @@ import com.triplepi.projectile.repositories.ScheduleItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,10 +56,13 @@ public class ScheduleService {
         scheduleItemRepository.save(scheduleItemDTO);
     }
 
-    public List<ScheduleItemDTO> getSchedule(String begin, String end, Long workCenterId) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:SSZ");
-        LocalDateTime beginDateTime = LocalDateTime.parse(begin, dateTimeFormatter);
-        LocalDateTime endDateTime = LocalDateTime.parse(end, dateTimeFormatter);
-        return scheduleItemRepository.findAll().stream().filter(x -> x.getStartDate().isAfter(beginDateTime) && x.getFactFinishDate().isBefore(endDateTime) && x.getWorkCenter().getId().equals(workCenterId)).collect(Collectors.toList());
+    public List<ScheduleItemDTO> getSchedule(String begin, String end, Long workCenterId) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SSZ");
+        Long beginLong = simpleDateFormat.parse(begin).getTime();
+        Long endLong = simpleDateFormat.parse(end).getTime();
+        LocalDateTime beginDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(beginLong), TimeZone.getDefault().toZoneId());
+        LocalDateTime endDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(endLong), TimeZone.getDefault().toZoneId());
+        List<ScheduleItemDTO> scheduleItemDTOS = scheduleItemRepository.findAll();
+        return scheduleItemDTOS.stream().filter(x -> x.getStartDate().isAfter(beginDateTime) && x.getFactFinishDate().isBefore(endDateTime) && x.getWorkCenter().getId().equals(workCenterId)).collect(Collectors.toList());
     }
 }

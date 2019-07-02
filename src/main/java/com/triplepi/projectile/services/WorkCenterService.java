@@ -20,4 +20,8 @@ public class WorkCenterService {
         workCenterRepository.saveAll(workCenterDTOS);
     }
 
+    public List<ScheduleItemWorkCenterDTO> getWorkCenters(){
+        return workCenterRepository.findAll();
+    }
+
 }
